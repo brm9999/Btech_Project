@@ -53,12 +53,14 @@ template2 = 'ffmpeg -hide_banner -loglevel panic -threads 1 -y -i {} -async 1 -a
 def process_video_file(args, gpu_id):
 	video_stream = cv2.VideoCapture(0)
 	count = 0
-	crpcount = 0
+	#crpcount = 0
 	#frames = []
 	fulldir = 'C:/Project/realtime/checking'
-	cropdir = 'C:/Project/realtime/cropped'
+	storage= 'C:/Project/realtime/finaldata'
+	#cropdir = 'C:/Project/realtime/cropped'
 	os.makedirs(fulldir, exist_ok=True)
-	os.makedirs(cropdir, exist_ok=True)
+	os.makedirs(storage, exist_ok=True)
+	i =-1
 
 	while 1:
 		
@@ -70,23 +72,23 @@ def process_video_file(args, gpu_id):
 		count+=1
 		frame = cv2.resize(frame, (frame.shape[1]//args.resize_factor, frame.shape[0]//args.resize_factor))
 		#frames.append(frame)
-		cv2.imwrite(os.path.join(cropdir, "frame{:d}.jpg".format(crpcount)), frame)
-		crpcount=1
+		#cv2.imwrite(os.path.join(cropdir, "frame{:d}.jpg".format(crpcount)), frame)
+		#crpcount+=1
 		#print("frames",frame)
 		#batches = [frames[i:i + args.batch_size] for i in range(0, len(frames), args.batch_size)]
-		i = -1
-		preds = fa[0].get_detections_for_batch(np.asarray(frame))
+		
+		preds = fa[0].get_detections_for_batch(np.asarray([frame]))
 
+        
+		print("Preds:",preds)
 		for j, f in enumerate(preds):
 			i += 1
+			print("F:",f)
 			if f is None:
 				continue
 
-			cv2.imwrite(path.join(fulldir, '{}.jpg'.format(i)), f[0])
-	
-	
-	
-	
+			cv2.imwrite(os.path.join(storage, '{}.jpg'.format(i)), f[0])
+		
 
 '''def mp_handler(job):
 	args, gpu_id = job
